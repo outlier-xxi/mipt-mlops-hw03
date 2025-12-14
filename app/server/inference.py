@@ -22,8 +22,10 @@ class ModelRunner:
             columns=df.columns,
             index=df.index
         )
-        prediction_input = df_scaled
-
+        # prediction_input = df_scaled
+        # Модель, которую сейчас использую, была натренирована на numpy array в ДЗ-1, 
+        # поэтому преобразуем в numpy array. Там нет feature names.
+        prediction_input = df_scaled.values
         # Make prediction
         y = self.model.predict(prediction_input)[0]
 
