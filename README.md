@@ -91,4 +91,15 @@ docker compose -f docker-compose.yaml -f docker-compose.nginx.yml \
 - `9090` — Prometheus
 - `3000` — Grafana
 
+## Screenshots
+
+![Скриншот](doc/screenshot/curl.png)
+
+![Скриншот](doc/screenshot/docker-ps.png)
+
+![Скриншот](doc/screenshot/grafana.png)
+
+![Скриншот](doc/screenshot/swagger-1.png)
+
+![Скриншот](doc/screenshot/swagger-2.png)
 
