@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "ml_service_blue"
+    static_configs:
+      - targets: ["ml_service_blue:8001"]
+  - job_name: "ml_service_green"
+    static_configs:
+      - targets: ["ml_service_green:8001"]
+

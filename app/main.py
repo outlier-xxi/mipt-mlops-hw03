@@ -25,7 +25,7 @@ WINE_FEATURES_EXAMPLE = {
 }
 
 
-VERSION = os.getenv("MODEL_VERSION", "v1.0.0")
+MODEL_VERSION = os.getenv("VERSION", "v1.0.0")
 MODEL_PATH = os.getenv("MODEL_PATH", "app/models/wine_quality_model.pkl")
 SCALER_PATH = os.getenv("SCALER_PATH", "app/models/wine_scaler.pkl")
 
@@ -40,7 +40,7 @@ async def lifespan(app: FastAPI):
     logger.info(f"Loading model from {MODEL_PATH} with scaler from {SCALER_PATH}")
     app.state.model_runner = ModelRunner(
         model_path=MODEL_PATH,
-        version=VERSION,
+        version=MODEL_VERSION,
         scaler_path=SCALER_PATH,
     )
     logger.info("Model loaded successfully")
@@ -53,7 +53,7 @@ app = FastAPI(title="ML", lifespan=lifespan)
 
 @app.get("/health")
 def health():
-    return {"status": "ok","version": VERSION}
+    return {"status": "ok","version": MODEL_VERSION}
 
 @app.post("/predict")
 def predict(features: Annotated[dict[str, float], Body(examples=[WINE_FEATURES_EXAMPLE])]):
@@ -70,14 +70,14 @@ def predict(features: Annotated[dict[str, float], Body(examples=[WINE_FEATURES_E
         return {
             "prediction": prediction,
             "confidence": confidence,
-            "version": VERSION,
+            "version": MODEL_VERSION,
         }
     except Exception as e:
         ERROR_COUNT.inc()
         latency = time.time() - start
         LATENCY.observe(latency)
         logger.error(f"Prediction failed: {e}, latency: {latency:.3f}s")
-        return {"error": str(e), "version": VERSION}
+        return {"error": str(e), "version": MODEL_VERSION}
 
 
 # Prometheus

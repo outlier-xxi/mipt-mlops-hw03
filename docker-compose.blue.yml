@@ -1,0 +1,7 @@
+services:
+  mlservice_blue:
+    build: .
+    environment:
+      - VERSION=v1.0.1
+    ports:
+      - "8001:8000"

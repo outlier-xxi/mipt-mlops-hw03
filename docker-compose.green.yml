@@ -1,0 +1,8 @@
+services:
+  mlservice_green:
+    build: .
+    environment:
+      - VERSION=v1.0.2
+    ports:
+      - "8002:8000"
+      

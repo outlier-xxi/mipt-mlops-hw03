@@ -1,0 +1,41 @@
+name: Model Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+        # Deploy to VM via SSH
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.VM_HOSTNAME }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY_ANSIBLE }}
+          script: |
+            # Navigate to app directory
+            mkdir -p /home/${{ secrets.SSH_USER }}/ml-ops-hw03
+            cd       /home/${{ secrets.SSH_USER }}/ml-ops-hw03
+            
+            # Pull latest docker-compose.yaml from repo
+            curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3.raw" \
+              -O -L https://api.github.com/repos/${{ github.repository }}/contents/docker-compose.yaml
+            
+            # Update images and restart services
+            docker-compose pull
+            docker-compose up -d --force-recreate
+            
+            # Clean up old images
+            docker image prune -f          
